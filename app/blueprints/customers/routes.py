@@ -11,6 +11,10 @@ def create_customer():
         data = customer_schema.load(request.json)
     except ValidationError as e:
         return jsonify({"error message" : e.messages}), 400
+    # Check if email exist or not because email is unique attribute
+    exist_customer = db.session.query(Customers).where(Customers.email == data["email"]).first()
+    if exist_customer:
+        return jsonify({"error" : f"{data["email"]} is already associated with an account."}), 400
     new_customer = Customers(**data)
     db.session.add(new_customer)
     db.session.commit()

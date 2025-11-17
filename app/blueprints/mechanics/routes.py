@@ -11,6 +11,10 @@ def create_mechanic():
         data = mechanic_schema.load(request.json)
     except ValidationError as e:
         return jsonify({"error message" : e.messages}), 400
+    # Check if email exist or not because email is unique attribute
+    exist_mechanic = db.session.query(Mechanics).where(Mechanics.email == data["email"]).first()
+    if exist_mechanic:
+        return jsonify({"error" : f"{data["email"]} is already associated with a mechanic's account."}), 400
     new_mechanic = Mechanics(**data)
     db.session.add(new_mechanic)
     db.session.commit()
