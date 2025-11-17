@@ -54,6 +54,10 @@ def update_customer(customer_id):
         customer_data = customer_schema.load(request.json)
     except ValidationError as e:
         return jsonify({"error message" : e.messages}), 400
+    # Check the email customer wants to update not be taken with another customer
+    existing_email = db.session.query(Customers).where(Customers.email == customer_data["email"], Customers.id != customer_id).first()
+    if existing_email:
+        return jsonify({"error" : f"{customer_data["email"]} is already taken with another customer."}), 400
     for key, value in customer_data.items():
         setattr(customer, key, value)
     db.session.commit()

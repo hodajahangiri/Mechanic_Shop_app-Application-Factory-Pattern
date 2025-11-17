@@ -50,6 +50,10 @@ def update_mechanic(mechanic_id):
         mechanic_data = mechanic_schema.load(request.json)
     except ValidationError as e:
         return jsonify({"error message" : e.messages}), 400
+    # Check the email Mechanic wants to update not be taken with another mechanic
+    existing_email = db.session.query(Mechanics).where(Mechanics.email == mechanic_data["email"], Mechanics.id != mechanic_id).first()
+    if existing_email:
+        return jsonify({"error" : f"{mechanic_data["email"]} is already taken with another mechanic."}), 400
     for key, value in mechanic_data.items():
         setattr(mechanic, key, value)
     db.session.commit()
