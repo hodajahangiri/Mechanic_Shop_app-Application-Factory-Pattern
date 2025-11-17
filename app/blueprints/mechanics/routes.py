@@ -24,6 +24,15 @@ def read_mechanics():
 def read_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanics, mechanic_id)
     if not mechanic:
-        return jsonify({"error" : f"Mechanic {mechanic_id} not found."}), 404
+        return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
     return mechanic_schema.jsonify(mechanic), 200
 
+@mechanics_bp.route('/<int:mechanic_id>', methods=["DELETE"])
+def delete_customer(mechanic_id):
+    mechanic = db.session.get(Mechanics, mechanic_id)
+    if not mechanic:
+        return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
+    db.session.delete(mechanic)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully deleted mechanic with id: {mechanic_id}"}), 200
+   
