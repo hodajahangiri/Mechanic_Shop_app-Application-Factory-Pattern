@@ -15,3 +15,15 @@ def create_mechanic():
     db.session.commit()
     return mechanic_schema.jsonify(new_mechanic), 201
 
+@mechanics_bp.route('', methods=["GET"])
+def read_mechanics():
+    mechanics = db.session.query(Mechanics).all()
+    return mechanics_schema.jsonify(mechanics), 200
+
+@mechanics_bp.route('/<int:mechanic_id>', methods=["GET"])
+def read_mechanic(mechanic_id):
+    mechanic = db.session.get(Mechanics, mechanic_id)
+    if not mechanic:
+        return jsonify({"error" : f"Mechanic {mechanic_id} not found."}), 404
+    return mechanic_schema.jsonify(mechanic), 200
+
