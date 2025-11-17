@@ -42,3 +42,17 @@ def delete_service_ticket(service_ticket_id):
     db.session.delete(service_ticket)
     db.session.commit()
     return jsonify({"message" : f"Successfully deleted service_ticket with id: {service_ticket_id}"}), 200
+
+@service_tickets_bp.route('/<int:service_ticket_id>', methods=["PUT"])
+def update_service_ticket(service_ticket_id):
+    service_ticket = db.session.get(Service_tickets, service_ticket_id)
+    if not service_ticket:
+        return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
+    try:
+        service_ticket_data = service_ticket_schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error message" : e.messages}), 400
+    for key, value in service_ticket_data.items():
+        setattr(service_ticket, key, value)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully service_ticket with id: {service_ticket_id} updated."}), 200
