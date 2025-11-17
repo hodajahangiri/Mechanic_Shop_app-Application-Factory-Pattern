@@ -1,5 +1,5 @@
 from app.blueprints.customers import customers_bp
-from app.models import Customers, db
+from app.models import Customers, db, Service_tickets
 from .schemas import customer_schema, customers_schema
 from flask import request, jsonify
 from marshmallow import ValidationError
@@ -33,6 +33,10 @@ def delete_customer(customer_id):
     customer = db.session.get(Customers, customer_id)
     if not customer:
         return jsonify({"error" : f"Customer with id: {customer_id} not found."}), 404
+    if len(customer.service_tickets)>0:
+        # Delete All service tickets for a specific user
+        db.session.query(Service_tickets).where(Service_tickets.customer_id == customer.id).delete()
+        db.session.commit()
     db.session.delete(customer)
     db.session.commit()
     return jsonify({"message" : f"Successfully deleted customer with id: {customer_id}"}), 200

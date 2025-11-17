@@ -10,6 +10,3 @@ with app.app_context():
 app.run()
 
 
-
-# https://github.com/hodajahangiri/Mechanic_Shop_app-Application-Factory-Pattern.git
-
