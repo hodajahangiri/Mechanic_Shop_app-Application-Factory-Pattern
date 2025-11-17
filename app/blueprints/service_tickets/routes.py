@@ -22,5 +22,15 @@ def create_service_ticket(customer_id):
     db.session.commit()
     return service_ticket_schema.jsonify(new_service_ticket), 201
 
+@service_tickets_bp.route('', methods=["GET"])
+def read_service_tickets():
+    service_tickets = db.session.query(Service_tickets).all()
+    return service_tickets_schema.jsonify(service_tickets), 200
 
+@service_tickets_bp.route('/<int:service_ticket_id>', methods=["GET"])
+def read_service_ticket(service_ticket_id):
+    service_ticket = db.session.get(Service_tickets, service_ticket_id)
+    if not service_ticket:
+        return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
+    return service_ticket_schema.jsonify(service_ticket), 200
 
