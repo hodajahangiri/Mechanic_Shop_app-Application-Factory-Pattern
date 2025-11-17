@@ -24,23 +24,23 @@ def read_customers():
 def read_customer(customer_id):
     customer = db.session.get(Customers, customer_id)
     if not customer:
-        return jsonify({"error" : f"Customer {customer_id} not found."}), 404
+        return jsonify({"error" : f"Customer with id: {customer_id} not found."}), 404
     return customer_schema.jsonify(customer), 200
 
 @customers_bp.route('/<int:customer_id>', methods=["DELETE"])
 def delete_customer(customer_id):
     customer = db.session.get(Customers, customer_id)
     if not customer:
-        return jsonify({"error" : f"Customer {customer_id} not found."}), 404
+        return jsonify({"error" : f"Customer with id: {customer_id} not found."}), 404
     db.session.delete(customer)
     db.session.commit()
-    return jsonify({"message" : f"Successfully deleted customer {customer_id}"}), 200
+    return jsonify({"message" : f"Successfully deleted customer with id: {customer_id}"}), 200
     
 @customers_bp.route('/<int:customer_id>', methods=["PUT"])
 def update_customer(customer_id):
     customer = db.session.get(Customers, customer_id)
     if not customer:
-       return jsonify({"error" : f"Customer {customer_id} not found."}), 404
+       return jsonify({"error" : f"Customer with id: {customer_id} not found."}), 404
     try:
         customer_data = customer_schema.load(request.json)
     except ValidationError as e:
@@ -48,4 +48,4 @@ def update_customer(customer_id):
     for key, value in customer_data.items():
         setattr(customer, key, value)
     db.session.commit()
-    return jsonify({"message" : f"Successfully customer {customer_id} updated."}), 200
+    return jsonify({"message" : f"Successfully customer with id: {customer_id} updated."}), 200

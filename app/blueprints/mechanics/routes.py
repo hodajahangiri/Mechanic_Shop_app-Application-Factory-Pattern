@@ -28,7 +28,7 @@ def read_mechanic(mechanic_id):
     return mechanic_schema.jsonify(mechanic), 200
 
 @mechanics_bp.route('/<int:mechanic_id>', methods=["DELETE"])
-def delete_customer(mechanic_id):
+def delete_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanics, mechanic_id)
     if not mechanic:
         return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
@@ -36,3 +36,16 @@ def delete_customer(mechanic_id):
     db.session.commit()
     return jsonify({"message" : f"Successfully deleted mechanic with id: {mechanic_id}"}), 200
    
+@mechanics_bp.route('/<int:mechanic_id>', methods=["PUT"])
+def update_mechanic(mechanic_id):
+    mechanic = db.session.get(Mechanics, mechanic_id)
+    if not mechanic:
+       return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
+    try:
+        mechanic_data = mechanic_schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error message" : e.messages}), 400
+    for key, value in mechanic_data.items():
+        setattr(mechanic, key, value)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} updated."}), 200
