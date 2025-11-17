@@ -1,4 +1,2 @@
 venv
 __pycache__/
-app/__pycache__/
-app/blueprints/customers/__pycache__/
