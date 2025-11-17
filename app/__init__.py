@@ -1,0 +1,21 @@
+from flask import Flask
+from .extensions import ma
+from .models import db
+from .blueprints.customers import customers_bp
+
+
+def create_app(config_name):
+    # Initialize my flask app
+    app = Flask(__name__)
+    app.config.from_object(f'config.{config_name}')
+
+    # Extensions
+    db.init_app(app)
+    ma.init_app(app)
+
+    # Register Blueprints
+    app.register_blueprint(customers_bp, url_prefix='/customers')
+
+
+
+    return app
