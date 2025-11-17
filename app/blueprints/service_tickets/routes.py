@@ -34,3 +34,11 @@ def read_service_ticket(service_ticket_id):
         return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
     return service_ticket_schema.jsonify(service_ticket), 200
 
+@service_tickets_bp.route('/<int:service_ticket_id>', methods=["DELETE"])
+def delete_service_ticket(service_ticket_id):
+    service_ticket = db.session.get(Service_tickets, service_ticket_id)
+    if not service_ticket:
+        return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
+    db.session.delete(service_ticket)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully deleted service_ticket with id: {service_ticket_id}"}), 200
