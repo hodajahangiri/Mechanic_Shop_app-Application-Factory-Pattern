@@ -2,7 +2,7 @@ from .schemas import service_ticket_schema, service_tickets_schema
 from app.blueprints.service_tickets import service_tickets_bp
 from flask import request, jsonify
 from marshmallow import ValidationError
-from app.models import Service_tickets, db, Customers
+from app.models import Service_tickets, db, Customers, Mechanics
 from app.blueprints.mechanics.schemas import mechanics_schema
 
 @service_tickets_bp.route('/<int:customer_id>', methods=["POST"])
@@ -63,4 +63,29 @@ def read_service_ticket_mechanics(service_ticket_id):
     if not service_ticket:
         return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
     return mechanics_schema.jsonify(service_ticket.mechanics)
+
+@service_tickets_bp.route('/<int:service_ticket_id>/assign-mechanic/<int:mechanic_id>', methods=["PUT"])
+def add_mechanic_to_service_ticket(service_ticket_id,mechanic_id):
+    service_ticket = db.session.get(Service_tickets, service_ticket_id)
+    mechanic = db.session.get(Mechanics,mechanic_id)
+    if not service_ticket:
+        return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
+    if not mechanic:
+       return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
+    service_ticket.mechanics.append(mechanic)
+    mechanic.tickets.append(service_ticket)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} added to service_ticket with id:{service_ticket_id}."}), 200
+
+@service_tickets_bp.route('/<int:service_ticket_id>/remove-mechanic/<int:mechanic_id>', methods=["PUT"])
+def remove_mechanic_from_service_ticket(service_ticket_id,mechanic_id):
+    service_ticket = db.session.get(Service_tickets, service_ticket_id)
+    mechanic = db.session.get(Mechanics,mechanic_id)
+    if not service_ticket:
+        return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
+    if not mechanic:
+       return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
+    service_ticket.mechanics.remove(mechanic)
+    db.session.commit()
+    return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} removed from service_ticket with id:{service_ticket_id}."}), 200
 
