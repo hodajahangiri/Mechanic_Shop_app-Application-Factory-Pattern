@@ -3,6 +3,7 @@ from app.models import Customers, db
 from .schemas import customer_schema, customers_schema
 from flask import request, jsonify
 from marshmallow import ValidationError
+from app.blueprints.service_tickets.schemas import service_tickets_schema
 
 @customers_bp.route('', methods=["POST"])
 def create_customer():
@@ -49,3 +50,11 @@ def update_customer(customer_id):
         setattr(customer, key, value)
     db.session.commit()
     return jsonify({"message" : f"Successfully customer with id: {customer_id} updated."}), 200
+
+@customers_bp.route('/service_tickets/<int:customer_id>', methods=["GET"])
+def read_customer_service_tickets(customer_id):
+    customer = db.session.get(Customers, customer_id)
+    if not customer:
+        return jsonify({"error" : f"Customer with id: {customer_id} not found."}), 404
+    return service_tickets_schema.jsonify(customer.service_tickets), 200
+
