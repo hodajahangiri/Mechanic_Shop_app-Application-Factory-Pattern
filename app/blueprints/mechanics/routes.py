@@ -49,3 +49,10 @@ def update_mechanic(mechanic_id):
         setattr(mechanic, key, value)
     db.session.commit()
     return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} updated."}), 200
+
+@mechanics_bp.route('/service_tickets/<int:mechanic_id>',methods=["GET"])
+def read_mechanic_service_tickets(mechanic_id):
+    mechanic = db.session.get(Mechanics,mechanic_id)
+    if not mechanic:
+        return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
+    return mechanic_schema.jsonify(mechanic.tickets), 200
