@@ -3,6 +3,7 @@ from app.models import Mechanics, db
 from .schemas import mechanic_schema, mechanics_schema
 from flask import request, jsonify
 from marshmallow import ValidationError
+from app.blueprints.service_tickets.schemas import service_tickets_schema
 
 @mechanics_bp.route('', methods=["POST"])
 def create_mechanic():
@@ -55,4 +56,4 @@ def read_mechanic_service_tickets(mechanic_id):
     mechanic = db.session.get(Mechanics,mechanic_id)
     if not mechanic:
         return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
-    return mechanic_schema.jsonify(mechanic.tickets), 200
+    return service_tickets_schema.jsonify(mechanic.tickets), 200
