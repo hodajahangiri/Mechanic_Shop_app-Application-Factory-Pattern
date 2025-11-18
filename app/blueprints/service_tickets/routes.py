@@ -72,10 +72,14 @@ def add_mechanic_to_service_ticket(service_ticket_id,mechanic_id):
         return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
     if not mechanic:
        return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
-    service_ticket.mechanics.append(mechanic)
-    mechanic.tickets.append(service_ticket)
-    db.session.commit()
-    return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} added to service_ticket with id:{service_ticket_id}."}), 200
+    if mechanic not in service_ticket.mechanics:
+        service_ticket.mechanics.append(mechanic)
+        mechanic.tickets.append(service_ticket)
+        db.session.commit()
+        return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} added to service_ticket with id:{service_ticket_id}."}), 200
+    else:
+        return jsonify({"message" : f"{mechanic.last_name} is already added in service_ticket with id:{service_ticket_id}."}),200
+
 
 @service_tickets_bp.route('/<int:service_ticket_id>/remove-mechanic/<int:mechanic_id>', methods=["PUT"])
 def remove_mechanic_from_service_ticket(service_ticket_id,mechanic_id):
@@ -85,7 +89,9 @@ def remove_mechanic_from_service_ticket(service_ticket_id,mechanic_id):
         return jsonify({"error" : f"Service_ticket with id: {service_ticket_id} not found."}), 404
     if not mechanic:
        return jsonify({"error" : f"Mechanic with id: {mechanic_id} not found."}), 404
-    service_ticket.mechanics.remove(mechanic)
-    db.session.commit()
-    return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} removed from service_ticket with id:{service_ticket_id}."}), 200
-
+    if mechanic in service_ticket.mechanics:
+        service_ticket.mechanics.remove(mechanic)
+        db.session.commit()
+        return jsonify({"message" : f"Successfully mechanic with id: {mechanic_id} removed from service_ticket with id:{service_ticket_id}."}), 200
+    else:
+        return jsonify({"message" : f"{mechanic.last_name} is not in service_ticket with id: {service_ticket.id}"}),200
